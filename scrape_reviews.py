@@ -47,6 +47,13 @@ def scrape_app_reviews(app_id, app_name, target_count=400):
     max_attempts = 10
     
     try:
+        # First, verify the app exists
+        try:
+            app_info = app(app_id, lang='en', country='us')
+            print(f"  App found: {app_info.get('title', 'N/A')}")
+        except Exception as e:
+            print(f"  ⚠ Warning: Could not verify app - {str(e)}")
+        
         while len(all_reviews) < target_count and attempts < max_attempts:
             try:
                 if continuation_token:
@@ -67,8 +74,11 @@ def scrape_app_reviews(app_id, app_name, target_count=400):
                         count=200
                     )
                 
-                all_reviews.extend(result)
-                print(f"  Collected {len(all_reviews)} reviews so far...")
+                if result:
+                    all_reviews.extend(result)
+                    print(f"  Collected {len(all_reviews)} reviews so far...")
+                else:
+                    print(f"  No reviews returned in this batch")
                 
                 if not continuation_token:
                     print(f"  No more reviews available. Collected {len(all_reviews)} reviews.")
@@ -80,14 +90,24 @@ def scrape_app_reviews(app_id, app_name, target_count=400):
                 
             except Exception as e:
                 print(f"  Error during scraping: {str(e)}")
+                print(f"  Error type: {type(e).__name__}")
                 attempts += 1
+                if attempts >= max_attempts:
+                    print(f"  Max attempts reached. Collected {len(all_reviews)} reviews so far.")
+                    break
                 time.sleep(5)
         
-        print(f"✓ Successfully collected {len(all_reviews)} reviews for {app_name}")
+        if len(all_reviews) > 0:
+            print(f"✓ Successfully collected {len(all_reviews)} reviews for {app_name}")
+        else:
+            print(f"⚠ No reviews collected for {app_name}. Check app ID and try again.")
         return all_reviews[:target_count]  # Return only the target count
         
     except Exception as e:
         print(f"✗ Failed to scrape reviews for {app_name}: {str(e)}")
+        print(f"  Error type: {type(e).__name__}")
+        import traceback
+        print(f"  Traceback: {traceback.format_exc()}")
         return []
 
 
