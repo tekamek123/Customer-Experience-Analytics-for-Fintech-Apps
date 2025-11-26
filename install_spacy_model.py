@@ -25,3 +25,4 @@ def install_spacy_model():
 if __name__ == "__main__":
     install_spacy_model()
 
+
