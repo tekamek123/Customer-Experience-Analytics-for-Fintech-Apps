@@ -14,8 +14,12 @@ week2/
 ├── data/
 │   ├── raw/              # Raw scraped data
 │   └── processed/        # Cleaned and processed data
-├── scrape_reviews.py     # Web scraping script
-├── preprocess_reviews.py  # Data preprocessing script
+├── scrape_reviews.py     # Web scraping script (Task 1)
+├── preprocess_reviews.py  # Data preprocessing script (Task 1)
+├── sentiment_analysis.py  # Sentiment analysis script (Task 2)
+├── thematic_analysis.py   # Thematic analysis script (Task 2)
+├── analysis_pipeline.py   # Main analysis pipeline (Task 2)
+├── install_spacy_model.py # Helper to install spaCy model
 ├── requirements.txt      # Python dependencies
 ├── .gitignore           # Git ignore rules
 └── README.md            # This file
@@ -59,22 +63,68 @@ This will:
 - Save cleaned data to `data/processed/reviews_cleaned.csv`
 - Generate data quality report
 
+### 5. Install spaCy Model (Required for Task 2)
+
+```bash
+python install_spacy_model.py
+```
+
+Or manually:
+```bash
+python -m spacy download en_core_web_sm
+```
+
+### 6. Run Sentiment and Thematic Analysis (Task 2)
+
+```bash
+python analysis_pipeline.py
+```
+
+This will:
+- Perform sentiment analysis using DistilBERT (with VADER fallback)
+- Extract keywords and identify themes for each bank
+- Assign themes to individual reviews
+- Generate aggregation reports by bank and rating
+- Save results to `data/processed/reviews_analyzed.csv`
+
+The pipeline produces:
+- **reviews_analyzed.csv**: Complete analysis with sentiment scores and themes
+- **sentiment_aggregation.csv**: Sentiment statistics by bank and rating
+- **theme_summary.csv**: Identified themes with top keywords per bank
+
 ## Data Schema
 
-The cleaned CSV file contains the following columns:
-
+### Cleaned Reviews (reviews_cleaned.csv)
 - **review**: Review text content
 - **rating**: Star rating (1-5)
 - **date**: Review date in YYYY-MM-DD format
 - **bank**: Bank name (Commercial Bank of Ethiopia, Bank of Abyssinia, or Dashen Bank)
 - **source**: Data source (Google Play Store)
 
+### Analyzed Reviews (reviews_analyzed.csv)
+- **review_id**: Unique identifier for each review
+- **review_text**: Review text content
+- **rating**: Star rating (1-5)
+- **date**: Review date in YYYY-MM-DD format
+- **bank**: Bank name
+- **source**: Data source
+- **sentiment_label**: Sentiment classification (positive/negative/neutral)
+- **sentiment_score**: Sentiment confidence score (0-1)
+- **identified_themes**: Semicolon-separated list of themes (e.g., "Account Access Issues; Transaction Performance")
+
 ## Key Performance Indicators (KPIs)
 
+### Task 1: Data Collection and Preprocessing
 - ✅ **Data Collection**: 1,200+ reviews collected
 - ✅ **Data Quality**: <5% missing data
 - ✅ **Per Bank**: Minimum 400 reviews per bank
 - ✅ **Clean Dataset**: Properly formatted CSV with all required columns
+
+### Task 2: Sentiment and Thematic Analysis
+- ✅ **Sentiment Coverage**: 90%+ reviews with sentiment scores
+- ✅ **Theme Identification**: 3+ themes per bank with examples
+- ✅ **Modular Pipeline**: Separate scripts for sentiment and thematic analysis
+- ✅ **Aggregation Reports**: Sentiment and theme statistics by bank and rating
 
 ## Methodology
 
@@ -93,10 +143,31 @@ The cleaned CSV file contains the following columns:
 3. **Date Normalization**: Converts various date formats to YYYY-MM-DD
 4. **Data Quality Checks**: Calculates and reports data quality metrics
 
+### Sentiment Analysis
+- **Primary Method**: DistilBERT-base-uncased-finetuned-sst-2-english (transformer model)
+- **Fallback Method**: VADER (rule-based sentiment analyzer)
+- **Output**: Sentiment label (positive/negative/neutral) and confidence score
+- **Aggregation**: Mean sentiment scores by bank and rating
+
+### Thematic Analysis
+- **Keyword Extraction**: 
+  - TF-IDF vectorization for n-grams (1-2 words)
+  - spaCy for POS tagging and lemmatization
+- **Theme Identification**: Rule-based clustering into 3-5 themes per bank:
+  - Account Access Issues
+  - Transaction Performance
+  - User Interface & Experience
+  - App Reliability & Bugs
+  - Customer Support
+  - Security & Privacy
+  - Feature Requests
+- **Theme Assignment**: Keywords matched to review text to assign themes
+
 ## Git Workflow
 
-This project uses the `task-1` branch for Task 1 deliverables:
+This project uses separate branches for each task:
 
+### Task 1 Branch
 ```bash
 # Create and switch to task-1 branch
 git checkout -b task-1
@@ -111,6 +182,21 @@ git commit -m "Add initial project structure and scraping scripts"
 git push origin task-1
 ```
 
+### Task 2 Branch
+```bash
+# Create and switch to task-2 branch
+git checkout -b task-2
+
+# Add analysis scripts
+git add sentiment_analysis.py thematic_analysis.py analysis_pipeline.py
+
+# Commit
+git commit -m "Add sentiment and thematic analysis pipeline"
+
+# Push to remote
+git push origin task-2
+```
+
 ## Notes
 
 - The scraper includes rate limiting to respect Google Play Store's terms of service
@@ -118,11 +204,12 @@ git push origin task-1
 - The preprocessing script will report data quality metrics to ensure KPIs are met
 - All data files are saved in UTF-8 encoding to handle special characters
 
-## Next Steps (Future Tasks)
+## Task Status
 
-- Task 2: Sentiment Analysis and Theme Extraction
-- Task 3: Database Design and Implementation
-- Task 4: Data Visualization and Reporting
+- ✅ **Task 1**: Data Collection and Preprocessing - Complete
+- ✅ **Task 2**: Sentiment and Thematic Analysis - Complete
+- ⏳ **Task 3**: Database Design and Implementation - Pending
+- ⏳ **Task 4**: Data Visualization and Reporting - Pending
 
 ## Contact
 
