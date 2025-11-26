@@ -10,18 +10,18 @@ from datetime import datetime
 import time
 
 # Bank app information
-# Note: These are placeholder app IDs - you may need to update with actual app IDs
+# App IDs from Google Play Store
 BANK_APPS = {
     "Commercial Bank of Ethiopia": {
-        "app_id": "com.cbe.mobilebanking",  # Update with actual app ID
+        "app_id": "com.combanketh.mobilebanking",  # https://play.google.com/store/apps/details?id=com.combanketh.mobilebanking
         "target_reviews": 400
     },
     "Bank of Abyssinia": {
-        "app_id": "com.bankofabyssinia.mobilebanking",  # Update with actual app ID
+        "app_id": "com.boa.boaMobileBanking",  # https://play.google.com/store/apps/details?id=com.boa.boaMobileBanking
         "target_reviews": 400
     },
     "Dashen Bank": {
-        "app_id": "com.dashen.mobilebanking",  # Update with actual app ID
+        "app_id": "com.dashen.dashensuperapp",  # https://play.google.com/store/apps/details?id=com.dashen.dashensuperapp
         "target_reviews": 400
     }
 }
