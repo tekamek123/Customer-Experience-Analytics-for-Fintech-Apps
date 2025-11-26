@@ -7,7 +7,7 @@ import pandas as pd
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from datetime import datetime
@@ -176,7 +176,10 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         collection_data = [['Bank', 'Reviews Collected']]
         for bank, count in bank_counts.items():
             collection_data.append([bank, f"{count:,}"])
-        collection_data.append(['<b>Total</b>', f"<b>{total_reviews:,}</b>"])
+        collection_data.append(['Total', f"{total_reviews:,}"])
+        
+        # Calculate total row index (last row)
+        total_row_idx = len(collection_data) - 1
         
         collection_table = Table(collection_data, colWidths=[4*inch, 2*inch])
         collection_table.setStyle(TableStyle([
@@ -190,6 +193,8 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
             ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#c5cae9')),
             ('FONTSIZE', (0, 1), (-1, -1), 10),
             ('ROWBACKGROUNDS', (0, 1), (-1, -2), [colors.white, colors.HexColor('#f5f5f5')]),
+            ('FONTNAME', (0, total_row_idx), (-1, total_row_idx), 'Helvetica-Bold'),  # Bold for total row
+            ('FONTSIZE', (0, total_row_idx), (-1, total_row_idx), 11),  # Slightly larger for emphasis
         ]))
         story.append(collection_table)
         story.append(Spacer(1, 0.3*inch))
