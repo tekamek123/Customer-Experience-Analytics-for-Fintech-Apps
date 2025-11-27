@@ -108,13 +108,13 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     normal_style.alignment = TA_JUSTIFY
     
     # ===== PAGE 1: TITLE PAGE =====
-    story.append(Spacer(1, 1.5*inch))
+    story.append(Spacer(1, 1.2*inch))
     
     # Title
     story.append(Paragraph("Customer Experience Analytics", title_style))
-    story.append(Spacer(1, 0.3*inch))
+    story.append(Spacer(1, 0.2*inch))
     story.append(Paragraph("for Fintech Mobile Banking Apps", title_style))
-    story.append(Spacer(1, 0.5*inch))
+    story.append(Spacer(1, 0.4*inch))
     
     # Subtitle
     subtitle = ParagraphStyle(
@@ -136,7 +136,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         textColor=colors.HexColor('#757575')
     )
     story.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y')}", date_style))
-    story.append(Spacer(1, 0.5*inch))
+    story.append(Spacer(1, 0.4*inch))
     
     # Project info
     info_style = ParagraphStyle(
@@ -148,7 +148,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     )
     story.append(Paragraph("Omega Consultancy", info_style))
     story.append(Paragraph("Week 2: Data Collection & Early Analysis", info_style))
-    story.append(Spacer(1, 0.3*inch))
+    story.append(Spacer(1, 0.2*inch))
     
     # Banks analyzed
     story.append(Paragraph("Analyzed Banks:", info_style))
@@ -174,7 +174,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     immediate attention.
     """
     story.append(Paragraph(objective_text, normal_style))
-    story.append(Spacer(1, 0.2*inch))
+    story.append(Spacer(1, 0.15*inch))
     
     if df_cleaned is not None:
         total_reviews = len(df_cleaned)
@@ -187,7 +187,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         comprehensive data preprocessing and early sentiment analysis completed.
         """
         story.append(Paragraph(summary_text, normal_style))
-        story.append(Spacer(1, 0.2*inch))
+        story.append(Spacer(1, 0.15*inch))
         
         # Data collection table
         story.append(Paragraph("Data Collection Summary", subheading_style))
@@ -219,17 +219,17 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         story.append(Spacer(1, 0.2*inch))
         
         # Create and add review count chart
-        fig, ax = plt.subplots(figsize=(5, 3))
+        fig, ax = plt.subplots(figsize=(4.5, 2.5))
         bank_counts_sorted = bank_counts.sort_values(ascending=True)
         colors_list = ['#3949ab', '#5c6bc0', '#7986cb']  # Blue gradient
         bars = ax.barh(bank_counts_sorted.index, bank_counts_sorted.values, color=colors_list)
-        ax.set_xlabel('Number of Reviews', fontsize=10, fontweight='bold')
-        ax.set_title('Reviews Collected by Bank', fontsize=11, fontweight='bold', pad=10)
+        ax.set_xlabel('Number of Reviews', fontsize=9, fontweight='bold')
+        ax.set_title('Reviews Collected by Bank', fontsize=10, fontweight='bold', pad=8)
         ax.grid(axis='x', alpha=0.3, linestyle='--')
         
         # Add value labels on bars
         for i, (bank, count) in enumerate(bank_counts_sorted.items()):
-            ax.text(count + 10, i, f'{count:,}', va='center', fontsize=9, fontweight='bold')
+            ax.text(count + 10, i, f'{count:,}', va='center', fontsize=8, fontweight='bold')
         
         plt.tight_layout()
         
@@ -239,31 +239,20 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         img_buffer.seek(0)
         plt.close()
         
-        # Add image to report
-        img = Image(img_buffer, width=5*inch, height=3*inch)
+        # Add image to report (optimized size)
+        img = Image(img_buffer, width=4.2*inch, height=2.3*inch)
         story.append(img)
-        story.append(Spacer(1, 0.3*inch))
+        story.append(Spacer(1, 0.15*inch))
     
     # Methodology
     story.append(Paragraph("Data Collection Methodology", subheading_style))
     methodology_text = """
-    Reviews were collected from the Google Play Store using the google-play-scraper 
-    library. The scraping process targeted a minimum of 400 reviews per bank, sorted by 
-    newest reviews first. Rate limiting was implemented to respect Google Play Store's 
-    terms of service and avoid being blocked. Each review captured includes:
+    Reviews were collected from the Google Play Store using the google-play-scraper library, 
+    targeting a minimum of 400 reviews per bank. The process included rate limiting to respect 
+    terms of service. Each review captured: review text, star rating (1-5), posting date, 
+    bank identifier, and source.
     """
     story.append(Paragraph(methodology_text, normal_style))
-    
-    bullet_points = [
-        "Review text content",
-        "Star rating (1-5)",
-        "Review posting date",
-        "Bank/app identifier",
-        "Data source (Google Play Store)"
-    ]
-    
-    for point in bullet_points:
-        story.append(Paragraph(f"• {point}", normal_style))
     
     story.append(PageBreak())
     
@@ -275,7 +264,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     and consistency. The preprocessing pipeline included:
     """
     story.append(Paragraph(preprocessing_text, normal_style))
-    story.append(Spacer(1, 0.2*inch))
+    story.append(Spacer(1, 0.15*inch))
     
     preprocessing_steps = [
         ("Duplicate Removal", "Removed duplicate reviews based on review text and bank identifier"),
@@ -286,10 +275,10 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     
     for step, desc in preprocessing_steps:
         story.append(Paragraph(f"<b>{step}:</b> {desc}", normal_style))
-        story.append(Spacer(1, 0.1*inch))
+        story.append(Spacer(1, 0.08*inch))
     
     if df_cleaned is not None:
-        story.append(Spacer(1, 0.2*inch))
+        story.append(Spacer(1, 0.15*inch))
         story.append(Paragraph("Data Quality Metrics", subheading_style))
         
         # Calculate quality metrics
@@ -321,8 +310,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
             ('FONTSIZE', (0, 1), (-1, -1), 10),
         ]))
         story.append(quality_table)
-    
-    story.append(Spacer(1, 0.3*inch))
+        story.append(Spacer(1, 0.15*inch))
     
     # Rating distribution
     if df_cleaned is not None:
@@ -350,19 +338,19 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         story.append(Spacer(1, 0.2*inch))
         
         # Create and add rating distribution chart
-        fig, ax = plt.subplots(figsize=(5, 3))
+        fig, ax = plt.subplots(figsize=(4.5, 2.5))
         rating_dist_sorted = rating_dist.sort_index()
         colors_list = ['#d32f2f', '#f57c00', '#fbc02d', '#689f38', '#388e3c']  # Red to green gradient
         rating_labels = [f"{r} Star{'s' if r > 1 else ''}" for r in rating_dist_sorted.index]
         bars = ax.bar(rating_labels, rating_dist_sorted.values, color=colors_list[:len(rating_dist_sorted)])
-        ax.set_xlabel('Rating', fontsize=10, fontweight='bold')
-        ax.set_ylabel('Number of Reviews', fontsize=10, fontweight='bold')
-        ax.set_title('Rating Distribution', fontsize=11, fontweight='bold', pad=10)
+        ax.set_xlabel('Rating', fontsize=9, fontweight='bold')
+        ax.set_ylabel('Number of Reviews', fontsize=9, fontweight='bold')
+        ax.set_title('Rating Distribution', fontsize=10, fontweight='bold', pad=8)
         ax.grid(axis='y', alpha=0.3, linestyle='--')
         
         # Add value labels on bars
         for i, (rating, count) in enumerate(rating_dist_sorted.items()):
-            ax.text(i, count + 10, f'{count:,}', ha='center', va='bottom', fontsize=9, fontweight='bold')
+            ax.text(i, count + 10, f'{count:,}', ha='center', va='bottom', fontsize=8, fontweight='bold')
         
         plt.tight_layout()
         
@@ -372,8 +360,8 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         img_buffer.seek(0)
         plt.close()
         
-        # Add image to report
-        img = Image(img_buffer, width=5*inch, height=3*inch)
+        # Add image to report (optimized size)
+        img = Image(img_buffer, width=4.2*inch, height=2.3*inch)
         story.append(img)
     
     story.append(PageBreak())
@@ -389,7 +377,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     reviews as positive, negative, or neutral with confidence scores.
     """
     story.append(Paragraph(sentiment_text, normal_style))
-    story.append(Spacer(1, 0.2*inch))
+    story.append(Spacer(1, 0.15*inch))
     
     if df_sentiment is not None:
         # Summary by bank
@@ -431,7 +419,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
             ('FONTSIZE', (0, 1), (-1, -1), 9),
         ]))
         story.append(sentiment_table)
-        story.append(Spacer(1, 0.3*inch))
+        story.append(Spacer(1, 0.15*inch))
     
     # Thematic Analysis
     story.append(Paragraph("Thematic Analysis", subheading_style))
@@ -454,7 +442,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     for theme in themes_list:
         story.append(Paragraph(f"• {theme}", normal_style))
     
-    story.append(Spacer(1, 0.2*inch))
+    story.append(Spacer(1, 0.15*inch))
     
     if df_themes is not None:
         story.append(Paragraph("Identified Themes by Bank", ParagraphStyle(
@@ -486,7 +474,7 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
         ]))
         story.append(theme_table)
     
-    story.append(Spacer(1, 0.3*inch))
+    story.append(Spacer(1, 0.15*inch))
     
     # Next Steps
     story.append(Paragraph("Next Steps", subheading_style))
