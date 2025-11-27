@@ -4,14 +4,18 @@ Creates a 4-page report covering scraping and early analysis
 """
 
 import pandas as pd
+import matplotlib
+matplotlib.use('Agg')  # Use non-interactive backend
+import matplotlib.pyplot as plt
 from reportlab.lib.pagesizes import letter, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, PageBreak, KeepTogether, Image
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from datetime import datetime
 import os
+import io
 
 
 def load_data():
@@ -157,13 +161,28 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
     # ===== PAGE 2: EXECUTIVE SUMMARY & DATA COLLECTION =====
     story.append(Paragraph("Executive Summary", heading_style))
     
+    # Business Objective
+    story.append(Paragraph("Business Objective", subheading_style))
+    objective_text = """
+    <b>The primary business objective of this project is to identify customer satisfaction 
+    drivers and pain points for mobile banking applications</b> used by three major Ethiopian 
+    banks: Commercial Bank of Ethiopia (CBE), Bank of Abyssinia (BOA), and Dashen Bank. 
+    By analyzing user reviews from the Google Play Store, Omega Consultancy aims to provide 
+    actionable insights that will help these banks improve their mobile applications, enhance 
+    customer retention, and increase user satisfaction. This analysis will uncover what 
+    features and aspects users value most, as well as identify critical issues that need 
+    immediate attention.
+    """
+    story.append(Paragraph(objective_text, normal_style))
+    story.append(Spacer(1, 0.2*inch))
+    
     if df_cleaned is not None:
         total_reviews = len(df_cleaned)
         bank_counts = df_cleaned['bank'].value_counts()
         
         summary_text = f"""
         This interim report presents the initial findings from analyzing customer reviews 
-        of mobile banking applications for three major Ethiopian banks. A total of 
+        of mobile banking applications for the three banks. A total of 
         <b>{total_reviews:,}</b> reviews were collected from the Google Play Store, with 
         comprehensive data preprocessing and early sentiment analysis completed.
         """
@@ -197,6 +216,32 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
             ('FONTSIZE', (0, total_row_idx), (-1, total_row_idx), 11),  # Slightly larger for emphasis
         ]))
         story.append(collection_table)
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Create and add review count chart
+        fig, ax = plt.subplots(figsize=(5, 3))
+        bank_counts_sorted = bank_counts.sort_values(ascending=True)
+        colors_list = ['#3949ab', '#5c6bc0', '#7986cb']  # Blue gradient
+        bars = ax.barh(bank_counts_sorted.index, bank_counts_sorted.values, color=colors_list)
+        ax.set_xlabel('Number of Reviews', fontsize=10, fontweight='bold')
+        ax.set_title('Reviews Collected by Bank', fontsize=11, fontweight='bold', pad=10)
+        ax.grid(axis='x', alpha=0.3, linestyle='--')
+        
+        # Add value labels on bars
+        for i, (bank, count) in enumerate(bank_counts_sorted.items()):
+            ax.text(count + 10, i, f'{count:,}', va='center', fontsize=9, fontweight='bold')
+        
+        plt.tight_layout()
+        
+        # Save to buffer
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+        img_buffer.seek(0)
+        plt.close()
+        
+        # Add image to report
+        img = Image(img_buffer, width=5*inch, height=3*inch)
+        story.append(img)
         story.append(Spacer(1, 0.3*inch))
     
     # Methodology
@@ -302,6 +347,34 @@ def create_report_pdf(output_file="Interim_Report.pdf"):
             ('FONTSIZE', (0, 1), (-1, -1), 10),
         ]))
         story.append(rating_table)
+        story.append(Spacer(1, 0.2*inch))
+        
+        # Create and add rating distribution chart
+        fig, ax = plt.subplots(figsize=(5, 3))
+        rating_dist_sorted = rating_dist.sort_index()
+        colors_list = ['#d32f2f', '#f57c00', '#fbc02d', '#689f38', '#388e3c']  # Red to green gradient
+        rating_labels = [f"{r} Star{'s' if r > 1 else ''}" for r in rating_dist_sorted.index]
+        bars = ax.bar(rating_labels, rating_dist_sorted.values, color=colors_list[:len(rating_dist_sorted)])
+        ax.set_xlabel('Rating', fontsize=10, fontweight='bold')
+        ax.set_ylabel('Number of Reviews', fontsize=10, fontweight='bold')
+        ax.set_title('Rating Distribution', fontsize=11, fontweight='bold', pad=10)
+        ax.grid(axis='y', alpha=0.3, linestyle='--')
+        
+        # Add value labels on bars
+        for i, (rating, count) in enumerate(rating_dist_sorted.items()):
+            ax.text(i, count + 10, f'{count:,}', ha='center', va='bottom', fontsize=9, fontweight='bold')
+        
+        plt.tight_layout()
+        
+        # Save to buffer
+        img_buffer = io.BytesIO()
+        plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight')
+        img_buffer.seek(0)
+        plt.close()
+        
+        # Add image to report
+        img = Image(img_buffer, width=5*inch, height=3*inch)
+        story.append(img)
     
     story.append(PageBreak())
     
