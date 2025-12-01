@@ -24,6 +24,10 @@ week2/
 ├── database_setup.py      # Database setup script (Task 3)
 ├── insert_reviews.py      # Data insertion script (Task 3)
 ├── verify_database.py     # Database verification queries (Task 3)
+├── analyze_insights.py   # Insights analysis (Task 4)
+├── create_visualizations.py # Visualization generator (Task 4)
+├── generate_recommendations.py # Recommendations report (Task 4)
+├── visualizations/       # Generated visualization plots (Task 4)
 ├── requirements.txt      # Python dependencies
 ├── .gitignore           # Git ignore rules
 └── README.md            # This file
@@ -129,6 +133,25 @@ This will:
 - Insert all cleaned review data from CSV files
 - Run verification queries to check data integrity
 
+### 8. Generate Insights and Visualizations (Task 4)
+
+```bash
+# Step 1: Analyze insights (drivers and pain points)
+python analyze_insights.py
+
+# Step 2: Create visualizations
+python create_visualizations.py
+
+# Step 3: Generate recommendations report
+python generate_recommendations.py
+```
+
+This will:
+- Create the `bank_reviews` database
+- Create `banks` and `reviews` tables with proper schema
+- Insert all cleaned review data from CSV files
+- Run verification queries to check data integrity
+
 ## Database Schema
 
 ### PostgreSQL Database: `bank_reviews`
@@ -211,6 +234,13 @@ Stores the scraped and processed review data with sentiment analysis.
 - ✅ **Data Verification**: SQL queries verify data integrity and quality
 - ✅ **Documentation**: Schema documented in README and SQL comments
 
+### Task 4: Insights and Recommendations
+- ✅ **Insights Analysis**: 2+ drivers and pain points identified per bank
+- ✅ **Bank Comparison**: Comparative analysis across all three banks
+- ✅ **Visualizations**: 5 plots created (sentiment, ratings, metrics, themes, word clouds)
+- ✅ **Recommendations**: Actionable recommendations with priorities per bank
+- ✅ **Ethics Section**: Potential biases and limitations documented
+
 ## Methodology
 
 ### Web Scraping
@@ -267,6 +297,21 @@ git commit -m "Add initial project structure and scraping scripts"
 git push origin task-1
 ```
 
+### Task 4 Branch
+```bash
+# Create and switch to task-4 branch
+git checkout -b task-4
+
+# Add analysis and visualization scripts
+git add analyze_insights.py create_visualizations.py generate_recommendations.py
+
+# Commit
+git commit -m "Add insights analysis, visualizations, and recommendations"
+
+# Push to remote
+git push origin task-4
+```
+
 ### Task 2 Branch
 ```bash
 # Create and switch to task-2 branch
@@ -309,7 +354,7 @@ git push origin task-3
 - ✅ **Task 1**: Data Collection and Preprocessing - Complete
 - ✅ **Task 2**: Sentiment and Thematic Analysis - Complete
 - ✅ **Task 3**: Database Design and Implementation - Complete
-- ⏳ **Task 4**: Data Visualization and Reporting - Pending
+- ✅ **Task 4**: Insights and Recommendations - Complete
 
 ## Contact
 
