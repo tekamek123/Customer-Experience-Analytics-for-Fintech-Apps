@@ -81,7 +81,7 @@ def insert_reviews_from_csv(csv_file="data/processed/reviews_cleaned.csv",
     # Connect to database
     conn = get_db_connection()
     if not conn:
-        print("✗ Failed to connect to database. Please run database_setup.py first.")
+        print("[ERROR] Failed to connect to database. Please run database_setup.py first.")
         return
     
     try:
@@ -100,11 +100,11 @@ def insert_reviews_from_csv(csv_file="data/processed/reviews_cleaned.csv",
             if 'sentiment_score' not in df.columns:
                 df['sentiment_score'] = None
         else:
-            print(f"✗ Error: Neither {csv_file} nor {analyzed_file} found.")
+            print(f"[ERROR] Error: Neither {csv_file} nor {analyzed_file} found.")
             print("  Please run preprocess_reviews.py and analysis_pipeline.py first.")
             return
         
-        print(f"✓ Loaded {len(df)} reviews")
+        print(f"[OK] Loaded {len(df)} reviews")
         
         # Map column names
         column_mapping = {
@@ -122,14 +122,27 @@ def insert_reviews_from_csv(csv_file="data/processed/reviews_cleaned.csv",
         required_cols = ['review_text', 'rating', 'bank_name']
         missing_cols = [col for col in required_cols if col not in df.columns]
         if missing_cols:
-            print(f"✗ Error: Missing required columns: {missing_cols}")
+            print(f"[ERROR] Error: Missing required columns: {missing_cols}")
             return
         
         # Fill missing values
-        df['review_date'] = df.get('review_date', pd.Series()).fillna('')
-        df['sentiment_label'] = df.get('sentiment_label', pd.Series()).fillna(None)
-        df['sentiment_score'] = df.get('sentiment_score', pd.Series()).fillna(None)
-        df['source'] = df.get('source', 'Google Play Store')
+        if 'review_date' not in df.columns:
+            df['review_date'] = ''
+        else:
+            df['review_date'] = df['review_date'].fillna('')
+        
+        if 'sentiment_label' not in df.columns:
+            df['sentiment_label'] = pd.NA
+        # Leave sentiment_label as is (pandas handles None/NA automatically)
+        
+        if 'sentiment_score' not in df.columns:
+            df['sentiment_score'] = pd.NA
+        # Leave sentiment_score as is (pandas handles None/NA automatically)
+        
+        if 'source' not in df.columns:
+            df['source'] = 'Google Play Store'
+        else:
+            df['source'] = df['source'].fillna('Google Play Store')
         
         # Get or create banks and map bank names to IDs
         print("\nProcessing banks...")
@@ -190,7 +203,7 @@ def insert_reviews_from_csv(csv_file="data/processed/reviews_cleaned.csv",
         )
         
         conn.commit()
-        print(f"✓ Successfully inserted {len(reviews_data)} reviews")
+        print(f"[OK] Successfully inserted {len(reviews_data)} reviews")
         
         cursor.close()
         conn.close()
@@ -200,7 +213,7 @@ def insert_reviews_from_csv(csv_file="data/processed/reviews_cleaned.csv",
         print("=" * 60)
         
     except Exception as e:
-        print(f"\n✗ Error inserting data: {e}")
+        print(f"\n[ERROR] Error inserting data: {e}")
         import traceback
         traceback.print_exc()
         if conn:

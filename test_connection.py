@@ -36,7 +36,7 @@ def test_connection():
             database='postgres',  # Connect to default database
             **db_params
         )
-        print("✓ Successfully connected to PostgreSQL server!")
+        print("[OK] Successfully connected to PostgreSQL server!")
         
         # Test 2: Check PostgreSQL version
         cursor = conn.cursor()
@@ -63,7 +63,7 @@ def test_connection():
                 database='bank_reviews',
                 **db_params
             )
-            print("✓ Successfully connected to 'bank_reviews' database!")
+            print("[OK] Successfully connected to 'bank_reviews' database!")
             
             # Test 5: Check tables
             cursor = conn.cursor()
@@ -95,7 +95,7 @@ def test_connection():
         return True
         
     except psycopg2.OperationalError as e:
-        print(f"\n✗ Connection failed: {e}")
+        print(f"\n[ERROR] Connection failed: {e}")
         print("\nTroubleshooting:")
         print("1. Check if PostgreSQL service is running")
         print("   - Windows: Open Services (services.msc)")
@@ -105,7 +105,7 @@ def test_connection():
         print("4. Make sure PostgreSQL is installed correctly")
         return False
     except Exception as e:
-        print(f"\n✗ Unexpected error: {e}")
+        print(f"\n[ERROR] Unexpected error: {e}")
         import traceback
         traceback.print_exc()
         return False

@@ -64,16 +64,16 @@ def create_database():
         
         if not exists:
             cursor.execute(sql.SQL("CREATE DATABASE bank_reviews"))
-            print("✓ Database 'bank_reviews' created successfully")
+            print("[OK] Database 'bank_reviews' created successfully")
         else:
-            print("✓ Database 'bank_reviews' already exists")
+            print("[OK] Database 'bank_reviews' already exists")
         
         cursor.close()
         conn.close()
         return True
         
     except psycopg2.Error as e:
-        print(f"✗ Error creating database: {e}")
+        print(f"[ERROR] Error creating database: {e}")
         conn.close()
         return False
 
@@ -85,7 +85,7 @@ def create_schema():
         with open('database_schema.sql', 'r', encoding='utf-8') as f:
             schema_sql = f.read()
     except FileNotFoundError:
-        print("✗ Error: database_schema.sql file not found")
+        print("[ERROR] Error: database_schema.sql file not found")
         return False
     
     conn = get_db_connection(create_db=False)
@@ -103,20 +103,21 @@ def create_schema():
             if statement:
                 try:
                     cursor.execute(statement)
+                    conn.commit()  # Commit after each successful statement
                 except psycopg2.Error as e:
                     # Ignore "already exists" errors
-                    if 'already exists' not in str(e).lower():
+                    if 'already exists' not in str(e).lower() and 'does not exist' not in str(e).lower():
                         print(f"  Warning: {e}")
+                    conn.rollback()  # Rollback on error, then continue
         
-        conn.commit()
-        print("✓ Database schema created successfully")
+        print("[OK] Database schema created successfully")
         
         cursor.close()
         conn.close()
         return True
         
     except psycopg2.Error as e:
-        print(f"✗ Error creating schema: {e}")
+        print(f"[ERROR] Error creating schema: {e}")
         conn.rollback()
         conn.close()
         return False
@@ -131,13 +132,13 @@ def main():
     # Step 1: Create database
     print("\n[Step 1/2] Creating database...")
     if not create_database():
-        print("✗ Failed to create database. Exiting.")
+        print("[ERROR] Failed to create database. Exiting.")
         return
     
     # Step 2: Create schema
     print("\n[Step 2/2] Creating schema...")
     if not create_schema():
-        print("✗ Failed to create schema. Exiting.")
+        print("[ERROR] Failed to create schema. Exiting.")
         return
     
     print("\n" + "=" * 60)
