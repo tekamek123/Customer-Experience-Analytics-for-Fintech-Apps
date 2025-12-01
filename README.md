@@ -20,6 +20,10 @@ week2/
 ├── thematic_analysis.py   # Thematic analysis script (Task 2)
 ├── analysis_pipeline.py   # Main analysis pipeline (Task 2)
 ├── install_spacy_model.py # Helper to install spaCy model
+├── database_schema.sql     # PostgreSQL database schema (Task 3)
+├── database_setup.py      # Database setup script (Task 3)
+├── insert_reviews.py      # Data insertion script (Task 3)
+├── verify_database.py     # Database verification queries (Task 3)
 ├── requirements.txt      # Python dependencies
 ├── .gitignore           # Git ignore rules
 └── README.md            # This file
@@ -92,6 +96,80 @@ The pipeline produces:
 - **sentiment_aggregation.csv**: Sentiment statistics by bank and rating
 - **theme_summary.csv**: Identified themes with top keywords per bank
 
+### 7. Set Up PostgreSQL Database (Task 3)
+
+**Prerequisites:**
+- Install PostgreSQL on your system
+- Create a database user with appropriate permissions
+
+**Configuration:**
+Create a `.env` file in the project root with your database credentials:
+```
+DB_HOST=localhost
+DB_PORT=5432
+DB_USER=postgres
+DB_PASSWORD=your_password
+```
+
+**Setup:**
+```bash
+# Step 1: Create database and schema
+python database_setup.py
+
+# Step 2: Insert cleaned review data
+python insert_reviews.py
+
+# Step 3: Verify data integrity
+python verify_database.py
+```
+
+This will:
+- Create the `bank_reviews` database
+- Create `banks` and `reviews` tables with proper schema
+- Insert all cleaned review data from CSV files
+- Run verification queries to check data integrity
+
+## Database Schema
+
+### PostgreSQL Database: `bank_reviews`
+
+The database consists of two main tables:
+
+#### Banks Table
+Stores information about the banks being analyzed.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `bank_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `bank_name` | VARCHAR(255) | Full name of the bank (UNIQUE) |
+| `app_name` | VARCHAR(255) | Name of the mobile banking application |
+| `created_at` | TIMESTAMP | Record creation timestamp |
+| `updated_at` | TIMESTAMP | Record update timestamp |
+
+#### Reviews Table
+Stores the scraped and processed review data with sentiment analysis.
+
+| Column | Type | Description |
+|--------|------|-------------|
+| `review_id` | SERIAL PRIMARY KEY | Auto-incrementing unique identifier |
+| `bank_id` | INTEGER | Foreign key to `banks.bank_id` |
+| `review_text` | TEXT | The actual review text content |
+| `rating` | INTEGER | Star rating from 1 to 5 (CHECK constraint) |
+| `review_date` | DATE | Date when the review was posted |
+| `sentiment_label` | VARCHAR(20) | Sentiment: positive, negative, or neutral |
+| `sentiment_score` | DECIMAL(5,4) | Confidence score (0.0 to 1.0) |
+| `source` | VARCHAR(100) | Source of review (default: 'Google Play Store') |
+| `created_at` | TIMESTAMP | Record creation timestamp |
+
+**Indexes:**
+- `idx_reviews_bank_id` on `bank_id` for faster joins
+- `idx_reviews_rating` on `rating` for filtering
+- `idx_reviews_date` on `review_date` for time-based queries
+- `idx_reviews_sentiment` on `sentiment_label` for sentiment analysis
+
+**Relationships:**
+- `reviews.bank_id` → `banks.bank_id` (Foreign Key with CASCADE delete)
+
 ## Data Schema
 
 ### Cleaned Reviews (reviews_cleaned.csv)
@@ -125,6 +203,13 @@ The pipeline produces:
 - ✅ **Theme Identification**: 3+ themes per bank with examples
 - ✅ **Modular Pipeline**: Separate scripts for sentiment and thematic analysis
 - ✅ **Aggregation Reports**: Sentiment and theme statistics by bank and rating
+
+### Task 3: Database Design and Implementation
+- ✅ **Database Setup**: PostgreSQL database `bank_reviews` created
+- ✅ **Schema Design**: Two-table relational schema with proper indexes
+- ✅ **Data Insertion**: Python script successfully inserts 1,200+ reviews
+- ✅ **Data Verification**: SQL queries verify data integrity and quality
+- ✅ **Documentation**: Schema documented in README and SQL comments
 
 ## Methodology
 
@@ -197,6 +282,21 @@ git commit -m "Add sentiment and thematic analysis pipeline"
 git push origin task-2
 ```
 
+### Task 3 Branch
+```bash
+# Create and switch to task-3 branch
+git checkout -b task-3
+
+# Add database files
+git add database_schema.sql database_setup.py insert_reviews.py verify_database.py
+
+# Commit
+git commit -m "Add PostgreSQL database schema and data insertion scripts"
+
+# Push to remote
+git push origin task-3
+```
+
 ## Notes
 
 - The scraper includes rate limiting to respect Google Play Store's terms of service
@@ -208,7 +308,7 @@ git push origin task-2
 
 - ✅ **Task 1**: Data Collection and Preprocessing - Complete
 - ✅ **Task 2**: Sentiment and Thematic Analysis - Complete
-- ⏳ **Task 3**: Database Design and Implementation - Pending
+- ✅ **Task 3**: Database Design and Implementation - Complete
 - ⏳ **Task 4**: Data Visualization and Reporting - Pending
 
 ## Contact
